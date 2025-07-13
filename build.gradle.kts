@@ -6,7 +6,7 @@ plugins {
     kotlin("jvm") version "2.2.0"
 }
 
-group = "io.github.eatbingchilling.kolomitm"
+group = "io.github.eatbingchilling.kolomitm2"
 version = "1.0.1"
 
 application {
