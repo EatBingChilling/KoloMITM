@@ -1,15 +1,15 @@
-name: Publish to GitHub Packages
+name: Release JAR
 
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      packages: write
+      contents: write           # 允许上传 Release
 
     steps:
       - uses: actions/checkout@v4
@@ -22,8 +22,13 @@ jobs:
           distribution: 'temurin'
 
       - run: chmod +x gradlew
+      - run: ./gradlew build shadowJar   # 生成 fat jar
 
-      - name: Publish
-        run: ./gradlew publishMavenPublicationToGitHubPackagesRepository
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # 自动发布 Release（tag 为当前日期-时间）
+      - uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: ${{ secrets.TOKEN }}
+          automatic_release_tag: latest
+          title: Latest Build
+          files: |
+            build/libs/*.jar
