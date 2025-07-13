@@ -6,7 +6,7 @@ plugins {
     kotlin("jvm") version "2.2.0"
 }
 
-group = "io.github.mucute.qwq.kolomitm"
+group = "io.github.eatbingchilling.kolomitm"
 version = "1.0-SNAPSHOT"
 
 application {
@@ -16,9 +16,7 @@ application {
 
 tasks.jar {
     manifest {
-        attributes(
-            "Main-Class" to "io.github.mucute.qwq.kolomitm.KoloMITM"
-        )
+        attributes("Main-Class" to "io.github.mucute.qwq.kolomitm.KoloMITM")
     }
 }
 
@@ -31,16 +29,11 @@ java {
 
 repositories {
     mavenCentral()
-    maven {
-        name = "opencollabRepositoryMavenSnapshots"
-        url = uri("https://repo.opencollab.dev/maven-snapshots")
-    }
-    maven {
-        name = "opencollabRepositoryMavenReleases"
-        url = uri("https://repo.opencollab.dev/maven-releases")
-    }
+    maven("https://repo.opencollab.dev/maven-snapshots")
+    maven("https://repo.opencollab.dev/maven-releases")
 }
 
+/* ---------- 发布配置 ---------- */
 publishing {
     publications {
         create<MavenPublication>("maven") {
@@ -51,64 +44,40 @@ publishing {
 
             pom {
                 packaging = "jar"
-                url.set("https://github.com/mucute-qwq/KoloMITM")
+                url.set("https://github.com/EatBingChilling/KoloMITM")
                 scm {
-                    connection.set("scm:git:git://github.com/mucute-qwq/KoloMITM.git")
-                    developerConnection.set("scm:git:ssh://github.com/mucute-qwq/KoloMITM.git")
-                    url.set("https://github.com/mucute-qwq/KoloMITM")
+                    connection.set("scm:git:git://github.com/EatBingChilling/KoloMITM.git")
+                    developerConnection.set("scm:git:ssh://github.com/EatBingChilling/KoloMITM.git")
+                    url.set("https://github.com/EatBingChilling/KoloMITM")
                 }
                 licenses {
                     license {
-                        name.set("The Apache Software License, Version 2.0")
+                        name.set("The Apache License, Version 2.0")
                         url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
                     }
                 }
                 developers {
-                    developer { name.set("mucute-qwq") }
-                }
-                ciManagement {
-                    system.set("GitHub Actions")
-                    url.set("https://github.com/mucute-qwq/KoloMITM/actions")
-                }
-                issueManagement {
-                    system.set("GitHub Issues")
-                    url.set("https://github.com/mucute-qwq/KoloMITM/issues")
+                    developer { name.set("EatBingChilling") }
                 }
             }
         }
     }
 
-    /* 本地仓库（原来就有） */
+    /* 同时支持本地 & GitHub Packages */
     repositories {
         mavenLocal()
-    }
-
-    /* 新增：GitHub Packages 仓库 */
-    repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/mucute-qwq/KoloMITM")
+            url = uri("https://maven.pkg.github.com/EatBingChilling/KoloMITM")
             credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
             }
         }
     }
 }
 
-
-val networkIncludedBuild = gradle.includedBuild("network")
-val protocolIncludedBuild = gradle.includedBuild("protocol")
-
-tasks["publishMavenPublicationToMavenLocal"].dependsOn(
-    networkIncludedBuild.task(":codec-query:publishMavenPublicationToMavenLocal"),
-    networkIncludedBuild.task(":codec-rcon:publishMavenPublicationToMavenLocal"),
-    networkIncludedBuild.task(":transport-raknet:publishMavenPublicationToMavenLocal"),
-    protocolIncludedBuild.task(":bedrock-codec:publishMavenPublicationToMavenLocal"),
-    protocolIncludedBuild.task(":common:publishMavenPublicationToMavenLocal"),
-    protocolIncludedBuild.task(":bedrock-connection:publishMavenPublicationToMavenLocal")
-)
-
+/* ---------- 依赖 ---------- */
 dependencies {
     api(libs.bedrock.codec)
     api(libs.common)
